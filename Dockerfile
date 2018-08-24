@@ -1,5 +1,5 @@
-FROM ubuntu:16.04
-MAINTAINER Emre <e@emre.pm>
+FROM debian:testing
+MAINTAINER CoRfr <broussel@sierrawireless.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
