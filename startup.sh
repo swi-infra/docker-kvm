@@ -155,7 +155,7 @@ else
     done
     IFS=$OIFS
   fi
-  
+
   if [ ! -z "$UDP_PORTS" ]; then
     OIFS=$IFS
     IFS=","
@@ -169,7 +169,7 @@ fi
 echo "Using ${NETWORK}"
 echo "parameter: ${FLAGS_NETWORK}"
 
-echo "[Remote Access]"
+echo "[remote]"
 if [ "$VNC" == "tcp" ]; then
   FLAGS_REMOTE_ACCESS="-vnc ${VNC_IP}:${VNC_ID}"
 elif [ "$VNC" == "reverse" ]; then
@@ -193,6 +193,11 @@ if [ -n "$KEYBOARD" ]; then
   echo "parameter: ${FLAGS_KEYBOARD}"
 fi
 
+if [ -n "$FLAGS_OTHER" ]; then
+  echo "[other]"
+  echo "parameters: ${FLAGS_OTHER}"
+fi
+
 set -x
 exec /usr/bin/kvm ${FLAGS_REMOTE_ACCESS} \
   -k en-us -m ${RAM} -smp ${SMP} -cpu ${FLAGS_CPU} -usb -usbdevice tablet -no-shutdown \
@@ -203,4 +208,5 @@ exec /usr/bin/kvm ${FLAGS_REMOTE_ACCESS} \
   ${FLAGS_ISO2} \
   ${FLAGS_NETWORK} \
   ${FLAGS_KEYBOARD} \
-  ${FLAGS_BOOT}
+  ${FLAGS_BOOT} \
+  ${FLAGS_OTHER}
