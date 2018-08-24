@@ -32,6 +32,8 @@ ENV VNC_SOCK /data/vnc.sock
 ENV TCP_PORTS ""
 ENV UDP_PORTS ""
 
+EXPOSE 22 5900
+
 VOLUME /data
 
 ENTRYPOINT ["/startup.sh"]
