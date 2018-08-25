@@ -126,6 +126,7 @@ elif [ "$NETWORK" == "macvtap" ]; then
   NETWORK_BRIDGE="${NETWORK_BRIDGE:-vtap0}"
   hexchars="0123456789ABCDEF"
   NETWORK_MAC="${NETWORK_MAC:-$(echo 00:F0$(for i in {1..8} ; do echo -n ${hexchars:$(( $RANDOM % 16 )):1} ; done | sed -e 's/\(..\)/:\1/g'))}"
+  echo "mac address: ${NETWORK_MAC}"
   set +e
   ip link add link $NETWORK_IF name $NETWORK_BRIDGE address $NETWORK_MAC type macvtap mode bridge
   if [[ $? -ne 0 ]]; then
@@ -195,6 +196,12 @@ if [ -n "$KEYBOARD" ]; then
   echo "parameter: ${FLAGS_KEYBOARD}"
 fi
 
+if [ -n "$USB" ]; then
+  echo "[usb]"
+  FLAGS_USB="-usb -usbdevice tablet"
+  echo "parameter: ${FLAGS_USB}"
+fi
+
 if [ -n "$FLAGS_OTHER" ]; then
   echo "[other]"
   echo "parameters: ${FLAGS_OTHER}"
@@ -202,7 +209,7 @@ fi
 
 set -x
 exec /usr/bin/kvm ${FLAGS_REMOTE_ACCESS} \
-  -k en-us -m ${RAM} -smp ${SMP} -cpu ${FLAGS_CPU} -usb -usbdevice tablet -no-shutdown \
+  -k en-us -m ${RAM} -smp ${SMP} -cpu ${FLAGS_CPU} -no-shutdown \
   -name ${HOSTNAME} \
   ${FLAGS_DISK_IMAGE} \
   ${FLAGS_FLOPPY_IMAGE} \
@@ -210,5 +217,6 @@ exec /usr/bin/kvm ${FLAGS_REMOTE_ACCESS} \
   ${FLAGS_ISO2} \
   ${FLAGS_NETWORK} \
   ${FLAGS_KEYBOARD} \
+  ${FLAGS_USB} \
   ${FLAGS_BOOT} \
   ${FLAGS_OTHER}
