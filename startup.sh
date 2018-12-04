@@ -94,7 +94,7 @@ if [ "$NETWORK" == "bridge" ]; then
   echo "mac address: ${NETWORK_MAC}"
   mkdir -p /etc/qemu
   echo allow $NETWORK_BRIDGE > /etc/qemu/bridge.conf
-  FLAGS_NETWORK="-netdev bridge,br=${NETWORK_BRIDGE},id=net0 -device virtio-net,netdev=net0,mac=${NETWORK_MAC}"
+  FLAGS_NETWORK="-netdev bridge,br=${NETWORK_BRIDGE},id=net0 -device virtio-net,romfile=${NETWORK_ROMFILE},netdev=net0,mac=${NETWORK_MAC}"
 elif [ "$NETWORK" == "tap" ]; then
   IFACE=eth0
   TAP_IFACE=tap0
