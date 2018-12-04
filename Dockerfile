@@ -2,7 +2,7 @@ FROM alpine:edge
 MAINTAINER CoRfr <broussel@sierrawireless.com>
 
 RUN \
-  apk add --no-cache qemu-system-x86_64 bridge-utils dnsmasq iproute2 wget iptables net-tools bash
+  apk add --no-cache qemu-system-x86_64 bridge-utils dnsmasq iproute2 wget iptables net-tools bash busybox-extras
 
 ADD startup.sh /
 
@@ -25,8 +25,9 @@ ENV VNC_PORT 5500
 ENV VNC_SOCK /data/vnc.sock
 ENV TCP_PORTS ""
 ENV UDP_PORTS ""
+ENV MONITOR telnet
 
-EXPOSE 22 5900
+EXPOSE 22 4444 5900
 
 VOLUME /data
 

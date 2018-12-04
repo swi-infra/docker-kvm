@@ -204,6 +204,13 @@ if [ -n "$USB" ]; then
   echo "parameter: ${FLAGS_USB}"
 fi
 
+if [ -n "$MONITOR" ]; then
+  echo "[monitor]"
+  if [ "$MONITOR" == "telnet" ]; then
+    FLAGS_MONITOR="-chardev socket,id=mon0,host=localhost,port=4444,server,nowait -mon chardev=mon0,mode=readline,pretty=on"
+  fi
+fi
+
 if [ -n "$FLAGS_DEBUG" ]; then
     touch /tmp/qemu.log
     tail -f /tmp/qemu.log &
@@ -222,6 +229,7 @@ exec ${QEMU} ${FLAGS_REMOTE_ACCESS} \
   -k en-us -m ${RAM} -smp ${SMP} -cpu ${FLAGS_CPU} -no-shutdown -enable-kvm \
   -name ${HOSTNAME} \
   ${FLAGS_DEBUG} \
+  ${FLAGS_MONITOR} \
   ${FLAGS_DISK_IMAGE} \
   ${FLAGS_FLOPPY_IMAGE} \
   ${FLAGS_ISO} \
