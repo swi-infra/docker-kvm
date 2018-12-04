@@ -76,7 +76,7 @@ elif [ "${IMAGE:0:4}" != "rbd:" ] && [ ! -f "$IMAGE" ]; then
   echo "IMAGE not found: ${IMAGE}"; exit 1;
 fi
 if [ "$DISK_DEVICE" == "scsi" ]; then
-  FLAGS_DISK_IMAGE="-device virtio-scsi-pci,id=scsi -drive file=${IMAGE},if=none,id=hd,cache=${IMAGE_CACHE},discard=${IMAGE_DISCARD},index=1 -device scsi-hd,drive=hd"
+  FLAGS_DISK_IMAGE="-device virtio-scsi-pci,id=scsi0,bus=pci.0 -drive file=${IMAGE},if=none,id=hd,cache=${IMAGE_CACHE},discard=${IMAGE_DISCARD} -device scsi-hd,drive=hd,bus=scsi0.0,scsi-id=0,lun=0,id=scsi-disk0"
 else
   FLAGS_DISK_IMAGE="-drive file=${IMAGE},if=${DISK_DEVICE},cache=${IMAGE_CACHE},format=${IMAGE_FORMAT},index=1"
 fi
