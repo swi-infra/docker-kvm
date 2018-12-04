@@ -1,14 +1,8 @@
-FROM debian:testing
+FROM alpine:edge
 MAINTAINER CoRfr <broussel@sierrawireless.com>
 
-ENV DEBIAN_FRONTEND noninteractive
-
 RUN \
-  apt-get update && \
-  apt-get install -y qemu-kvm qemu-utils bridge-utils dnsmasq uml-utilities iptables wget net-tools && \
-  apt-get autoclean && \
-  apt-get autoremove && \
-  rm -rf /var/lib/apt/lists/*
+  apk add --no-cache qemu-system-x86_64 bridge-utils dnsmasq iproute2 wget iptables net-tools bash
 
 ADD startup.sh /
 

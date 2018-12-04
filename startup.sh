@@ -11,9 +11,11 @@ if [ ! -e /dev/kvm ]; then
   set -e
 fi
 
+QEMU=/usr/bin/qemu-system-x86_64
+
 # If we were given arguments, override the default configuration
 if [ $# -gt 0 ]; then
-  exec /usr/bin/kvm $@
+  exec $QEMU $@
   exit $?
 fi
 
@@ -208,7 +210,7 @@ if [ -n "$FLAGS_OTHER" ]; then
 fi
 
 set -x
-exec /usr/bin/kvm ${FLAGS_REMOTE_ACCESS} \
+exec ${QEMU} ${FLAGS_REMOTE_ACCESS} \
   -k en-us -m ${RAM} -smp ${SMP} -cpu ${FLAGS_CPU} -no-shutdown \
   -name ${HOSTNAME} \
   ${FLAGS_DISK_IMAGE} \
