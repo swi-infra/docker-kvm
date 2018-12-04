@@ -209,6 +209,8 @@ if [ -n "$FLAGS_OTHER" ]; then
   echo "parameters: ${FLAGS_OTHER}"
 fi
 
+${QEMU} --version
+
 set -x
 exec ${QEMU} ${FLAGS_REMOTE_ACCESS} \
   -k en-us -m ${RAM} -smp ${SMP} -cpu ${FLAGS_CPU} -no-shutdown \
