@@ -204,17 +204,24 @@ if [ -n "$USB" ]; then
   echo "parameter: ${FLAGS_USB}"
 fi
 
+if [ -n "$FLAGS_DEBUG" ]; then
+    touch /tmp/qemu.log
+    tail -f /tmp/qemu.log &
+fi
+
 if [ -n "$FLAGS_OTHER" ]; then
   echo "[other]"
   echo "parameters: ${FLAGS_OTHER}"
 fi
 
-${QEMU} --version
-
 set -x
+
+${QEMU} -version
+
 exec ${QEMU} ${FLAGS_REMOTE_ACCESS} \
   -k en-us -m ${RAM} -smp ${SMP} -cpu ${FLAGS_CPU} -no-shutdown -enable-kvm \
   -name ${HOSTNAME} \
+  ${FLAGS_DEBUG} \
   ${FLAGS_DISK_IMAGE} \
   ${FLAGS_FLOPPY_IMAGE} \
   ${FLAGS_ISO} \
