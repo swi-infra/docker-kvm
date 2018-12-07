@@ -2,7 +2,7 @@ FROM alpine:edge
 MAINTAINER CoRfr <broussel@sierrawireless.com>
 
 RUN \
-  apk add --no-cache qemu-system-x86_64 bridge-utils dnsmasq iproute2 wget iptables net-tools bash busybox-extras
+  apk add --no-cache qemu-system-x86_64 qemu-img bridge-utils dnsmasq iproute2 wget iptables net-tools bash busybox-extras
 
 ADD startup.sh /
 
