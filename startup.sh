@@ -207,7 +207,8 @@ fi
 if [ -n "$MONITOR" ]; then
   echo "[monitor]"
   if [ "$MONITOR" == "telnet" ]; then
-    FLAGS_MONITOR="-chardev socket,id=mon0,host=localhost,port=4444,server,nowait -mon chardev=mon0,mode=readline,pretty=on"
+    MONITOR_PORT=${MONITOR_PORT:-4444}
+    FLAGS_MONITOR="-chardev socket,id=mon0,host=localhost,port=$MONITOR_PORT,server,nowait -mon chardev=mon0,mode=readline,pretty=on"
   fi
 fi
 
