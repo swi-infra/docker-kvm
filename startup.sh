@@ -59,7 +59,7 @@ if [ -n "$ISO2" ]; then
     if [ ! -f "/data/${basename}" ] || [ "$ISO_DOWNLOAD" != "0" ]; then
       wget -O- "$ISO2" > /data/${basename}
     fi
-    ISO=/data/${basename}
+    ISO2=/data/${basename}
   fi
   FLAGS_ISO2="-drive file=${ISO2},media=cdrom,index=3"
   if [ "${ISO2:0:4}" != "rbd:" ] && [ ! -f "$ISO2" ]; then
@@ -175,12 +175,28 @@ echo "Using ${NETWORK}"
 echo "parameter: ${FLAGS_NETWORK}"
 
 echo "[remote]"
-if [ "$VNC" == "tcp" ]; then
+
+# Spice
+if [ "$SPICE" == "tcp" ]; then
+  SPICE_ID=${SPICE_ID:-$VNC_ID}
+  SPICE_PORT=${SPICE_PORT:-$((5900 + $SPICE_ID))}
+  FLAGS_SPICE_PWD=",disable-ticketing"
+  if [ -n "$SPICE_PASSWORD" ]; then
+    FLAGS_SPICE_PWD=",password=$SPICE_PASSWORD"
+  fi
+  FLAGS_REMOTE_ACCESS="-vga qxl -spice port=${SPICE_PORT}${FLAGS_SPICE_PWD} -device virtio-serial-pci -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 -chardev spicevmc,id=spicechannel0,name=vdagent"
+elif [ "$SPICE" == "sock" ]; then
+  FLAGS_REMOTE_ACCESS="-vga qxl -spice unix,addr=${SPICE_SOCK},disable-ticketing -device virtio-serial-pci -device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 -chardev spicevmc,id=spicechannel0,name=vdagent"
+
+# VNC
+elif [ "$VNC" == "tcp" ]; then
   FLAGS_REMOTE_ACCESS="-vnc ${VNC_IP}:${VNC_ID}"
 elif [ "$VNC" == "reverse" ]; then
   FLAGS_REMOTE_ACCESS="-vnc ${VNC_IP}:${VNC_PORT},reverse"
 elif [ "$VNC" == "sock" ]; then
   FLAGS_REMOTE_ACCESS="-vnc unix:${VNC_SOCK}"
+
+# No graphics
 else
   FLAGS_REMOTE_ACCESS="-nographic"
 fi
