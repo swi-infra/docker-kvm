@@ -69,6 +69,12 @@ if [ -n "$ISO2" ]; then
   echo "parameter: ${FLAGS_ISO2}"
 fi
 
+if [ $BIOS -eq 1 ]; then
+  echo "[bios]"
+  FLAGS_BIOS="-bios ${BIOS_IMAGE}"
+  echo "parameter: ${FLAGS_BIOS}"
+fi
+
 echo "[disk image]"
 if [ "$IMAGE_CREATE" == "1" ]; then
   qemu-img create -f ${IMAGE_FORMAT} ${IMAGE} ${IMAGE_SIZE}
@@ -76,11 +82,13 @@ elif [ "${IMAGE:0:4}" != "rbd:" ] && [ ! -f "$IMAGE" ]; then
   echo "IMAGE not found: ${IMAGE}"; exit 1;
 fi
 if [ "$DISK_DEVICE" == "scsi" ]; then
-  FLAGS_DISK_IMAGE="-device virtio-scsi-pci,id=scsi0,bus=pci.0 -drive file=${IMAGE},if=none,id=hd,cache=${IMAGE_CACHE},discard=${IMAGE_DISCARD} -device scsi-hd,drive=hd,bus=scsi0.0,scsi-id=0,lun=0,id=scsi-disk0"
+  FLAGS_DISK_IMAGE="-device virtio-scsi-pci,id=scsi0 -drive file=${IMAGE},if=none,id=hd,cache=${IMAGE_CACHE},discard=${IMAGE_DISCARD} -device scsi-hd,drive=hd,bus=scsi0.0,scsi-id=0,lun=0,id=scsi-disk0"
+elif [ "$DISK_DEVICE" == "blk" ]; then
+  FLAGS_DISK_IMAGE="-device virtio-blk-pci,scsi=off,addr=0x3,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1 -drive file=${IMAGE},if=none,id=drive-virtio-disk0,format=${IMAGE_FORMAT}"
 else
   FLAGS_DISK_IMAGE="-drive file=${IMAGE},if=${DISK_DEVICE},cache=${IMAGE_CACHE},format=${IMAGE_FORMAT},index=1"
 fi
-echo "parameter: ${FLAGS_DISK_IMAGE}"
+echo "parameter: [$DISK_DEVICE] ${FLAGS_DISK_IMAGE}"
 
 if [ -n "$FLOPPY" ]; then
   echo "[floppy image]"
@@ -204,6 +212,11 @@ else
 fi
 echo "parameter: ${FLAGS_REMOTE_ACCESS}"
 
+if [ $CONSOLE -eq 1 ]; then
+  FLAGS_CONSOLE="-serial stdio"
+  echo "parameter: ${FLAGS_CONSOLE}"
+fi
+
 if [ -n "$BOOT" ]; then
   echo "[boot]"
   FLAGS_BOOT="-boot ${BOOT}"
@@ -246,16 +259,18 @@ ${QEMU} -version 2>&1
 set -x
 
 exec ${QEMU} ${FLAGS_REMOTE_ACCESS} \
-  -k en-us -m ${RAM} -smp ${SMP} -cpu ${FLAGS_CPU} -no-shutdown -enable-kvm \
+  -k en-us -machine ${MACHINE} -m ${RAM} -smp ${SMP} -cpu ${FLAGS_CPU} -no-shutdown -enable-kvm \
   -name ${HOSTNAME} \
   ${FLAGS_DEBUG} \
   ${FLAGS_MONITOR} \
   ${FLAGS_DISK_IMAGE} \
   ${FLAGS_FLOPPY_IMAGE} \
+  ${FLAGS_CONSOLE} \
   ${FLAGS_ISO} \
   ${FLAGS_ISO2} \
   ${FLAGS_NETWORK} \
   ${FLAGS_KEYBOARD} \
   ${FLAGS_USB} \
   ${FLAGS_BOOT} \
+  ${FLAGS_BIOS} \
   ${FLAGS_OTHER}
