@@ -249,6 +249,12 @@ if [ -n "$FLAGS_DEBUG" ]; then
     tail -f /tmp/qemu.log &
 fi
 
+if [ "$BALLOON" == "1" ]; then
+  echo "[balloon]"
+  FLAGS_BALLOON="-device virtio-balloon"
+  echo "parameter: ${FLAGS_BALLOON}"
+fi
+
 if [ -n "$FLAGS_OTHER" ]; then
   echo "[other]"
   echo "parameters: ${FLAGS_OTHER}"
@@ -259,10 +265,17 @@ ${QEMU} -version 2>&1
 set -x
 
 exec ${QEMU} ${FLAGS_REMOTE_ACCESS} \
-  -k en-us -machine ${MACHINE} -m ${RAM} -smp ${SMP} -cpu ${FLAGS_CPU} -no-shutdown -enable-kvm \
+  -k en-us \
+  -machine ${MACHINE} \
+  -m ${RAM} \
+  -smp ${SMP} \
+  -cpu ${FLAGS_CPU} \
+  -no-shutdown \
+  -enable-kvm \
   -name ${HOSTNAME} \
   ${FLAGS_DEBUG} \
   ${FLAGS_MONITOR} \
+  ${FLAGS_BALLOON} \
   ${FLAGS_DISK_IMAGE} \
   ${FLAGS_FLOPPY_IMAGE} \
   ${FLAGS_CONSOLE} \

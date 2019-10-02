@@ -29,6 +29,7 @@ ENV MONITOR ""
 ENV CONSOLE 1
 ENV BIOS 1
 ENV BIOS_IMAGE /opt/qemu/seabios-no-usb.bin
+ENV BALLOON 1
 
 ADD startup.sh /
 ADD seabios-no-usb.bin /opt/qemu/
