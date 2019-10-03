@@ -4,7 +4,7 @@ MAINTAINER CoRfr <broussel@sierrawireless.com>
 RUN \
   apk add --no-cache qemu-system-x86_64 qemu-img bridge-utils dnsmasq iproute2 wget iptables net-tools bash busybox-extras
 
-ENV MACHINE q35
+ENV MACHINE pc
 ENV RAM 2048
 ENV SMP 1
 ENV CPU qemu64
