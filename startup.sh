@@ -97,14 +97,20 @@ if [ -n "$FLOPPY" ]; then
 fi
 
 echo "[network]"
-if [ "$NETWORK" == "bridge" ]; then
-  NETWORK_BRIDGE="${NETWORK_BRIDGE:-docker0}"
+NETWORK_DEV="${NETWORK_DEV:-virtio-net}"
+
+get_mac() {
   hexchars="0123456789ABCDEF"
   NETWORK_MAC="${NETWORK_MAC:-$(echo 00:F0$(for i in {1..8} ; do echo -n ${hexchars:$(( $RANDOM % 16 )):1} ; done | sed -e 's/\(..\)/:\1/g'))}"
   echo "mac address: ${NETWORK_MAC}"
+}
+
+if [ "$NETWORK" == "bridge" ]; then
+  NETWORK_BRIDGE="${NETWORK_BRIDGE:-docker0}"
+  get_mac
   mkdir -p /etc/qemu
   echo allow $NETWORK_BRIDGE > /etc/qemu/bridge.conf
-  FLAGS_NETWORK="-netdev bridge,br=${NETWORK_BRIDGE},id=net0 -device virtio-net,romfile=${NETWORK_ROMFILE},netdev=net0,mac=${NETWORK_MAC}"
+  FLAGS_NETWORK="-netdev bridge,br=${NETWORK_BRIDGE},id=net0 -device ${NETWORK_DEV},romfile=${NETWORK_ROMFILE},netdev=net0,mac=${NETWORK_MAC}"
 elif [ "$NETWORK" == "tap" ]; then
   IFACE=eth0
   TAP_IFACE=tap0
@@ -130,12 +136,11 @@ elif [ "$NETWORK" == "tap" ]; then
   else
     iptables -t nat -A PREROUTING -d $IP -j DNAT --to-destination $NETWORK_IP
   fi
-  FLAGS_NETWORK="-netdev tap,id=net0,ifname=tap0,vhost=on,script=no,downscript=no -device virtio-net-pci,netdev=net0"
+  get_mac
+  FLAGS_NETWORK="-netdev tap,id=net0,ifname=tap0,vhost=on,script=no,downscript=no -device ${NETWORK_DEV},romfile=${NETWORK_ROMFILE},netdev=net0,mac=${NETWORK_MAC}"
 elif [ "$NETWORK" == "macvtap" ]; then
   NETWORK_IF="${NETWORK_IF:-eth0}"
   NETWORK_BRIDGE="${NETWORK_BRIDGE:-vtap0}"
-  hexchars="0123456789ABCDEF"
-  NETWORK_MAC="${NETWORK_MAC:-$(echo 00:F0$(for i in {1..8} ; do echo -n ${hexchars:$(( $RANDOM % 16 )):1} ; done | sed -e 's/\(..\)/:\1/g'))}"
   echo "mac address: ${NETWORK_MAC}"
   set +e
   ip link add link $NETWORK_IF name $NETWORK_BRIDGE address $NETWORK_MAC type macvtap mode bridge
@@ -143,7 +148,8 @@ elif [ "$NETWORK" == "macvtap" ]; then
     echo "Warning! Bridge interface already exists"
   fi
   set -e
-  FLAGS_NETWORK="-netdev tap,fd=3,id=net0,vhost=on -net nic,vlan=0,netdev=net0,macaddr=$NETWORK_MAC,model=virtio"
+  get_mac
+  FLAGS_NETWORK="-netdev tap,fd=3,id=net0,vhost=on -device ${NETWORK_DEV},romfile=${NETWORK_ROMFILE},netdev=net0,mac=${NETWORK_MAC}"
   exec 3<> /dev/tap`cat /sys/class/net/$NETWORK_BRIDGE/ifindex`
   ip link set $NETWORK_BRIDGE up
   if [ ! -z "$NETWORK_IF2" ]; then
