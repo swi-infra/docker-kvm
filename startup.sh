@@ -246,7 +246,7 @@ if [ -n "$MONITOR" ]; then
   if [ "$MONITOR" == "telnet" ]; then
     MONITOR_HOST=${MONITOR_HOST:-localhost}
     MONITOR_PORT=${MONITOR_PORT:-4444}
-    FLAGS_MONITOR="-chardev socket,id=mon0,host=$MONITOR_HOST,port=$MONITOR_PORT,server,nowait -mon chardev=mon0,mode=readline,pretty=on"
+    FLAGS_MONITOR="-chardev socket,id=mon0,host=$MONITOR_HOST,port=$MONITOR_PORT,server,nowait -mon chardev=mon0,mode=readline"
   fi
 fi
 
